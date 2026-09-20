@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: xiang
+  profiles:
+    active: dev
+  jpa:
+    # 是否自动建表：dev 用 update，prod 在 application-prod.yaml 里覆盖为 validate
+    hibernate:
+      ddl-auto: update
+    # 控制台打印执行的 SQL
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    # 关闭 session 与请求线程绑定，避免懒加载在 Controller 层隐式触发查询
+    open-in-view: false
+  # Redis：连接信息走环境变量，本地默认 localhost:6379
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+# 接口文档（springdoc）：JSON 在 /v3/api-docs，UI 在 /swagger-ui.html
+# 生产环境在 application-prod.yaml 里整体关闭
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # 按 tag 排序，接口多了不至于找不到
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  # 交给 logback-spring.xml 接管，以便日志文件名带上日期
+  config: classpath:logback-spring.xml
+  # 日志目录：这里是兜底默认值，dev / prod 各自在 application-{profile}.yaml 里覆盖
+  file:
+    path: logs
+  # 日志级别：root 为全局默认，其余按包名细化
+  level:
+    root: info
+    org.springframework.web: warn
+    org.springframework.security: warn
+  # 滚动切割策略：按天切 + 单文件超限再按序号滚动，保留 30 天、总大小上限 1GB
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB
+      clean-history-on-start: false
+  # 控制台带颜色，文件不带颜色
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%15.15t] %-40.40logger{39} : %m%n%wEx"
+  charset:
+    console: UTF-8
+    file: UTF-8

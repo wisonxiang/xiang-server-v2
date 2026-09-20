@@ -1,0 +1,50 @@
+logging:
+  # 生产环境：日志落在 /var/log/test19，可用环境变量 LOG_PATH 覆盖，业务代码只记 info
+  file:
+    path: ${LOG_PATH:/var/log/test19}
+  level:
+    com.xiang.test19: info
+  logback:
+    rollingpolicy:
+      max-history: 60
+      total-size-cap: 5GB
+
+jwt:
+  # HS256 要求密钥长度不少于 32 字节，生产环境请替换并通过环境变量注入
+  secret: ${JWT_SECRET}
+  expiration: 3600000
+
+rsa:
+  private-key: ${PRIVATE_KEY}
+
+spring:
+  datasource:
+    # 生产环境：连接信息不写死在配置里，统一通过环境变量注入（DB_URL / DB_USERNAME / DB_PASSWORD）
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  # 错误响应不回传堆栈、异常类名与内部信息，详情只写服务端日志
+  # 注意：Boot 4 起这些属性从 server.error.* 迁到了 spring.web.error.*
+  web:
+    error:
+      include-stacktrace: never
+      include-message: never
+      include-exception: false
+      whitelabel:
+        enabled: false
+  jpa:
+    # 生产环境：只校验表结构是否匹配，绝不自动建表或改表（表结构交由迁移脚本维护）
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+# 接口文档：生产环境整体关闭，避免对外暴露接口结构
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

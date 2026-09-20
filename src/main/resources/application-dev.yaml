@@ -1,0 +1,28 @@
+logging:
+  # 开发环境：日志落在项目根目录下的 logs/（已加 .gitignore），业务代码开 debug
+  file:
+    path: logs
+  level:
+    com.xiang.test19: debug
+
+
+jwt:
+  # HS256 要求密钥长度不少于 32 字节，生产环境请替换并通过环境变量注入
+  secret: ${JWT_SECRET:test19-jwt-secret-key-please-change-in-production-0123456789}
+  expiration: 3600000
+
+rsa:
+  private-key: ${PRIVATE_KEY:MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBALw+4T7cVwT/XjwXA+CNckZUbfWKzuf3X8ZS0vytODXWsJefIdlN60TBZOjYXSlCmyObOl6us+dDQvaU09gaIKyf4UISj5AoJ1JGUY75n6prU7ZXJoIzKv7KGBnm2Os3tF6L7w4kgaimL0OKhmucvgqMOCuLRyS6h1xruYSTAHbfAgMBAAECgYEAhBpAaaOo8Znf4J1qHCBHDHHdhI23q3Oe44dmBunsY2PZI14KG/whWWu6S+jiX70dL/yUFrPVDjrWeEJy89lKCYXf9Tx6eQTULRNFKvLBD34k9y9pi1KdyYYKC3EnSYvbtjnUiBEVDzvUgq/VTKL1G8nsxxZNED9ZjlV1KRTAe1ECQQDmsub4YCBp71oMOSSPJKGJVUUk4ZcRym8AJwIAJyIUmlGnxqZFqDWoYQltOUoj/PbaFvecFPXVV3Fy5toaOTonAkEA0OQPz1vrbiVvMt0HDV95e4KVnsN7Ju/0WzPXgk7B2C2GwcavKnj44kxeJhicKxmfIERdexfZ/Am30raWIgvoiQJBALOg91DL4FE76jx8PegrGJBLUcRO1wcmPVm8BcXCsrmiExR1C8BPIkCSFfny0rTE4hycJ35jn6rXJGHYOFiU2J8CQQCGRkM/aHfCmr+K83cICpodYYhpwIBWPCJXydA7DAMgwcsAnoWUiKR7WtmeJW2latfVtvxcFq3hjCGkigehpQP5AkBjdvekIddIX71TFojmbKOOnDi9U8b7EE8atIGRuKq/UjUvw8c1deBa2+yhw8ABFZ2brl6TY1x9uZowIU1Dk4qi}
+# 公钥 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8PuE+3FcE/148FwPgjXJGVG31is7n91/GUtL8rTg11rCXnyHZTetEwWTo2F0pQpsjmzperrPnQ0L2lNPYGiCsn+FCEo+QKCdSRlGO+Z+qa1O2VyaCMyr+yhgZ5tjrN7Rei+8OJIGopi9DioZrnL4KjDgri0ckuodca7mEkwB23wIDAQAB
+spring:
+  datasource:
+    # 开发环境：H2 内存库，进程结束即销毁；DB_CLOSE_DELAY=-1 保证连接断开后库不被回收
+    url: jdbc:h2:file:./data/test19_db;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  # H2 网页控制台：http://localhost:8080/h2-console（JDBC URL 填上面的 url，用户 sa、密码留空）
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
