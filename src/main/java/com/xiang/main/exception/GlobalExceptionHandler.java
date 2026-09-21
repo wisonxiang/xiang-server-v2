@@ -6,10 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -45,6 +48,23 @@ public class GlobalExceptionHandler {
         int status = e.getStatusCode().value();
         return ResponseEntity.status(e.getStatusCode())
                 .body(Result.fail(status, e.getReason()));
+    }
+
+    /**
+     * 未定义路由：关掉静态资源映射后由 DispatcherServlet 抛 NoHandlerFoundException，
+     * 静态资源未命中时抛 NoResourceFoundException，都按 404 返回，不能落进下面的兜底 500
+     */
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+    public ResponseEntity<Result<Void>> handleNotFoundException(Exception e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Result.fail(HttpStatus.NOT_FOUND.value(), "接口不存在"));
+    }
+
+    /** 请求方法与路由不匹配（如对只支持 POST 的接口发 GET），返回 405 而不是 500 */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Result<Void>> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(Result.fail(HttpStatus.METHOD_NOT_ALLOWED.value(), "请求方法不支持"));
     }
 
     /**
